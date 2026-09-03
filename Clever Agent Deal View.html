@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clever Offers — Agent Deal View (Concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12181F; --ink-soft:#3A4652; --paper:#F7F5F1; --card:#FFFFFF;
+    --rule:#DCD8D1; --signal:#1B6B4A; --signal-soft:#E4F0EA;
+    --flat:#8C8478; --alert:#A8531E; --alert-soft:#F6EAE0;
+    --shadow:0 1px 0 rgba(18,24,31,.06), 0 8px 24px -18px rgba(18,24,31,.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Sora',system-ui,sans-serif;
+    line-height:1.5;padding:32px 20px 72px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1060px;margin:0 auto}
+
+  .framing{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:26px}
+  .framing h1{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+  .framing p{color:var(--ink-soft);max-width:68ch;font-size:15px}
+  .illus{margin-top:14px;font-size:12.5px;color:var(--alert);
+    border-left:2px solid var(--alert);padding-left:10px;max-width:68ch}
+
+  .switch{display:flex;margin:24px 0 28px;border:1px solid var(--ink);border-radius:2px;width:fit-content;overflow:hidden}
+  .switch button{font-family:inherit;font-size:14px;font-weight:500;padding:11px 20px;
+    border:0;cursor:pointer;background:transparent;color:var(--ink);transition:background .15s,color .15s}
+  .switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .switch button:focus-visible{outline:2px solid var(--alert);outline-offset:-3px}
+
+  .property{display:flex;flex-wrap:wrap;gap:26px;align-items:baseline;background:var(--card);
+    border:1px solid var(--rule);border-radius:3px;padding:18px 22px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .property .addr{font-size:17px;font-weight:600}
+  .property .ctx{font-size:13px;color:var(--ink-soft);margin-top:3px}
+  .property dl{display:flex;gap:24px;flex-wrap:wrap;margin-left:auto}
+  .property dt{font-size:12px;color:var(--flat);margin-bottom:2px}
+  .property dd{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500}
+
+  .liquidity{border-radius:3px;padding:20px 24px;margin-bottom:12px;box-shadow:var(--shadow);
+    border:1px solid var(--rule);background:var(--card)}
+  .liquidity.yes{border-color:var(--signal);background:var(--signal-soft)}
+  .liquidity.no{border-color:var(--alert);background:var(--alert-soft)}
+  .liquidity .lab{display:block;font-size:12px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.04em;color:var(--ink-soft);margin-bottom:6px}
+  .liquidity .headline{display:block;font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+  .liquidity.yes .headline{color:var(--signal)}
+  .liquidity.no .headline{color:var(--alert)}
+  .liquidity .funnel{display:block;font-family:'IBM Plex Mono',monospace;font-size:14px;
+    color:var(--ink-soft);margin-top:8px}
+  .liquidity .funnel b{color:var(--ink);font-weight:600}
+
+  .pkg{background:var(--card);border:1px solid var(--rule);border-radius:3px;
+    padding:14px 18px;margin-bottom:26px;box-shadow:var(--shadow)}
+  .pkg h3{font-size:13px;font-weight:600;margin-bottom:8px}
+  .pkg ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+  .pkg li{font-size:12px;border:1px solid var(--rule);border-radius:2px;padding:3px 8px;color:var(--ink-soft)}
+  .pkg li.missing{border-color:var(--alert);color:var(--alert);background:var(--alert-soft)}
+  .pkg-note{margin-top:10px;font-size:11.5px;color:var(--flat)}
+
+  .panelhead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+  .panelhead h2{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .count{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft)}
+
+  .offers{display:flex;flex-direction:column;gap:10px}
+  .offer{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--flat);
+    border-radius:3px;padding:15px 18px;display:grid;grid-template-columns:1fr auto auto;
+    gap:22px;align-items:center;box-shadow:var(--shadow)}
+  .offer.lead{border-left-color:var(--signal);background:var(--signal-soft)}
+  .offer.muted{opacity:.72}
+  .offer .who{font-weight:600;font-size:15px}
+  .offer .terms{font-size:13px;color:var(--ink-soft);margin-top:3px}
+  .offer .amount{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;text-align:right;white-space:nowrap}
+  .offer .close{font-size:12px;color:var(--flat);text-align:right;margin-top:3px}
+  .cert{text-align:right;min-width:112px}
+  .cert .lbl{font-size:11px;color:var(--flat);margin-bottom:3px}
+  .cert .val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600}
+  .cert .val.hi{color:var(--signal)} .cert .val.mid{color:var(--ink-soft)} .cert .val.lo{color:var(--alert)}
+  .tag{display:inline-block;font-size:11px;font-weight:600;color:var(--signal);
+    border:1px solid var(--signal);border-radius:2px;padding:1px 6px;margin-left:8px;vertical-align:1px}
+  .tag.warn{color:var(--alert);border-color:var(--alert)}
+  .tag.grey{color:var(--flat);border-color:var(--rule)}
+
+  .cmp{margin-top:26px;background:var(--card);border:1px solid var(--rule);
+    border-radius:3px;padding:18px 20px;box-shadow:var(--shadow)}
+  .cmp h3{font-size:15px;font-weight:600;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:9px 12px;font-size:14px;border-bottom:1px solid var(--rule)}
+  th{font-size:12px;color:var(--flat);font-weight:500}
+  td.num{font-family:'IBM Plex Mono',monospace;font-weight:500}
+  tr:last-child td{border-bottom:0}
+  td.best{color:var(--signal);font-weight:600}
+  .cta{margin-top:14px;font-family:inherit;font-size:14px;font-weight:500;
+    background:var(--ink);color:var(--paper);border:0;border-radius:2px;padding:10px 18px;cursor:pointer}
+  .cta:focus-visible{outline:2px solid var(--alert);outline-offset:2px}
+  .success-note{margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-soft)}
+
+  .note{margin-top:28px;padding-top:20px;border-top:1px solid var(--rule);
+    font-size:13.5px;color:var(--ink-soft);max-width:74ch}
+  .note strong{color:var(--ink);font-weight:600}
+  .note p + p{margin-top:10px}
+
+  @media (max-width:680px){
+    .offer{grid-template-columns:1fr;gap:8px}
+    .offer .amount,.offer .close,.cert{text-align:left}
+    .property dl{margin-left:0}
+    table{font-size:13px} th,td{padding:7px 8px}
+  }
+  @media (prefers-reduced-motion:no-preference){ .offer{animation:in .3s ease both} }
+  @keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="framing">
+    <h1>Agent deal view — what the agent walks in holding</h1>
+    <p>Same seller, same property, same single point of contact. The only variable is how many buyers were asked, and what the agent can tell the seller about each one. Toggle between the experience I received when I mystery-shopped Clever Offers and the pilot concept.</p>
+    <p class="illus">All figures are illustrative and are not based on Clever investor data.</p>
+  </div>
+
+  <div class="switch" role="group" aria-label="Choose view">
+    <button id="btnNow" aria-pressed="true">What I received today</button>
+    <button id="btnNew" aria-pressed="false">Pilot: dense market</button>
+    <button id="btnThin" aria-pressed="false">Pilot: thin market</button>
+  </div>
+
+  <div class="property">
+    <div>
+      <div class="addr">3bd / 2ba, 1,480 sqft — pilot metro</div>
+      <div class="ctx">Seller relocating for work in 5 weeks. Certainty of close matters more than top dollar.</div>
+    </div>
+    <dl>
+      <div><dt>Est. value</dt><dd>$412,000</dd></div>
+      <div><dt>Condition</dt><dd>Fair</dd></div>
+      <div><dt>Occupancy</dt><dd>Owner</dd></div>
+    </dl>
+  </div>
+
+  <div class="liquidity" id="liquidity">
+    <span class="lab">Competitive liquidity</span>
+    <span class="headline" id="liqHeadline"></span>
+    <span class="funnel" id="funnel"></span>
+  </div>
+
+  <div class="pkg">
+    <h3 id="pkgTitle">Listing package contents</h3>
+    <ul id="pkgList"></ul><div class="pkg-note" id="pkgNote"></div>
+  </div>
+
+  <div class="panelhead">
+    <h2 id="panelTitle">Offers presented to seller</h2>
+    <div class="count" id="panelCount"></div>
+  </div>
+
+  <div class="offers" id="offers"></div>
+  <div id="cmpWrap"></div>
+  <div class="note" id="note"></div>
+
+</div>
+
+<script>
+  const PKG_NOW=[
+    {t:"Exterior + interior photos"},{t:"Basic property facts"},
+    {t:"Repair estimate",missing:true},{t:"Occupancy + access",missing:true},
+    {t:"Title / lien status",missing:true},{t:"Systems age (roof, HVAC)",missing:true}
+  ];
+  const PKG_NEW=[
+    {t:"Exterior + interior photos"},{t:"Basic property facts"},{t:"Repair estimate"},
+    {t:"Occupancy + access"},{t:"Title / lien status"},{t:"Systems age (roof, HVAC)"}
+  ];
+
+  const TODAY=[
+    {who:"Fast cash offer",terms:"Pre-set product — buyer not disclosed to seller",
+     amount:"$291,000",close:"Close in 7–14 days",cert:"Not shown",certClass:"mid"},
+    {who:"Cash offer with upside",terms:"~80% up front ($232,800), balance contingent on resale",
+     amount:"$291,000",close:"Close in 14–21 days",cert:"Not shown",certClass:"mid",warn:"Same valuation"}
+  ];
+
+  const PILOT=[
+    {who:"Investor A",terms:"High-fit local investor · buy-and-hold",
+     amount:"$318,500",close:"Close in 14 days",cert:"Verified",certClass:"hi",lead:true,actionable:true},
+    {who:"Investor B",terms:"High-fit regional investor · value-add",
+     amount:"$312,000",close:"Close in 12 days",cert:"Verified",certClass:"hi",actionable:true},
+    {who:"Investor C",terms:"Medium-fit institutional buyer · deducts a service fee",
+     amount:"$327,000",close:"Close in 21 days",cert:"Verified",certClass:"hi",
+     warn:"Lower net after fee",actionable:true},
+    {who:"Investor D",terms:"Medium-fit local investor",
+     amount:"$304,000",close:"Close in 10 days",cert:"Limited history",certClass:"lo",muted:true,
+     warn:"Not actionable — funds unverified"},
+    {who:"Investor E",terms:"Wholesaler · end buyer not verified",
+     amount:"$331,000",close:"Close in 7 days",cert:"Limited history",certClass:"lo",muted:true,
+     warn:"Not actionable — no proof of funds"}
+  ];
+
+  const THIN=[
+    {who:"Investor F",terms:"Medium-fit local investor",
+     amount:"$286,000",close:"Close in 20 days",cert:"Unverified",certClass:"lo",muted:true,
+     warn:"Not actionable"},
+    {who:"Investor G",terms:"Low-fit regional investor",
+     amount:"$271,000",close:"Close in 30 days",cert:"Unverified",certClass:"lo",muted:true,
+     warn:"Not actionable — below existing offer"}
+  ];
+
+  const $=id=>document.getElementById(id);
+  const offersEl=$('offers'),cmpEl=$('cmpWrap'),noteEl=$('note'),pkgNote=$('pkgNote'),titleEl=$('panelTitle'),
+        countEl=$('panelCount'),pkgList=$('pkgList'),pkgTitle=$('pkgTitle'),
+        funnelEl=$('funnel'),liqEl=$('liquidity'),liqHead=$('liqHeadline'),btnNow=$('btnNow'),btnNew=$('btnNew'),btnThin=$('btnThin');
+
+  const THIN_NOTE = `
+    <p><strong>This is the outcome I expect in a thin market, and it is the one worth designing for.</strong> Four investors matched the buy box, two responded, neither cleared the actionable bar — one couldn't verify funds, one bid below what the seller is already being offered.</p>
+    <p>Shipping software would not have fixed this. The constraint is investor supply in this metro, not tooling. The honest response is to route this seller back to their existing options, and to move the roadmap toward investor acquisition here before any platform build.</p>
+    <p>The reason to run the pilot manually is so this result costs us three weeks of concierge time instead of a quarter of engineering. If most pilot markets look like this, that is a finding, not a failure — and the gates set in week one should let us say so out loud.</p>`;
+
+  function render(mode){
+    const data = mode==='now'?TODAY:(mode==='thin'?THIN:PILOT);
+    const pkg  = mode==='now'?PKG_NOW:PKG_NEW;
+    const pass = mode==='new';
+
+    liqEl.className = 'liquidity ' + (pass?'yes':'no');
+    liqHead.textContent = mode==='now' ? 'No competing offers'
+                        : mode==='thin' ? '0 actionable offers'
+                        : '3 actionable offers';
+    funnelEl.innerHTML = mode==='now'
+      ? `<b>1</b> partner &rarr; <b>2</b> options &rarr; <b>1</b> valuation`
+      : mode==='thin'
+      ? `<b>4</b> matched &rarr; <b>2</b> responded &rarr; <b>0</b> actionable`
+      : `<b>14</b> matched &rarr; <b>5</b> responded &rarr; <b>3</b> actionable`;
+
+    pkgTitle.textContent = mode==='now'
+      ? 'Listing package — what the buyer sees before bidding'
+      : 'Minimum viable investor package';
+    pkgList.innerHTML = pkg.map(p=>`<li class="${p.missing?'missing':''}">${p.t}${p.missing?' — not collected':''}</li>`).join('');
+    pkgNote.textContent = mode==='now'
+      ? 'Baseline shown from the mystery-shop experience. Missing fields are discovery questions, not assumed requirements.'
+      : 'Illustrative minimum viable package. Week 1 transaction shadowing validates which fields actually improve offer quality.';
+
+    offersEl.innerHTML = data.map((o,i)=>`
+      <div class="offer${o.lead?' lead':''}${o.muted?' muted':''}" style="animation-delay:${i*45}ms">
+        <div>
+          <div class="who">${o.who}${o.lead?'<span class="tag">Best net to seller</span>':''}${o.warn?`<span class="tag ${o.muted?'grey':'warn'}">${o.warn}</span>`:''}</div>
+          <div class="terms">${o.terms}</div>
+        </div>
+        <div class="cert">
+          <div class="lbl">Buyer verification</div>
+          <div class="val ${o.certClass}">${o.cert}</div>
+        </div>
+        <div>
+          <div class="amount">${o.amount}</div>
+          <div class="close">${o.close}</div>
+        </div>
+      </div>`).join('');
+
+    countEl.textContent = mode==='now' ? '2 options, 1 valuation'
+                        : mode==='thin' ? '2 responses, 0 actionable offers'
+                        : '5 responses, 3 actionable offers';
+    titleEl.textContent = mode==='now' ? 'Offers presented to seller' : 'Bids returned to agent';
+
+    cmpEl.innerHTML = (mode!=='new') ? '' : `
+      <div class="cmp">
+        <h3>Seller comparison</h3>
+        <table>
+          <thead><tr><th></th><th>Investor A</th><th>Investor B</th><th>Existing cash offer</th><th>Traditional listing</th></tr></thead>
+          <tbody>
+            <tr><td>Offer</td><td class="num">$318,500</td><td class="num">$312,000</td><td class="num">$291,000</td><td class="num">Est. higher</td></tr>
+            <tr><td>Est. net to seller</td><td class="num best">$318,500</td><td class="num">$312,000</td><td class="num">$291,000</td><td class="num">Est. higher, less certain</td></tr>
+            <tr><td>Close</td><td>14 days</td><td>12 days</td><td>7–14 days</td><td>45–60+ days</td></tr>
+            <tr><td>Buyer verification</td><td>Verified</td><td>Verified</td><td>Not shown</td><td>n/a</td></tr>
+            <tr><td>Certainty</td><td class="best">High</td><td>High</td><td>Unknown</td><td>Variable</td></tr>
+            <tr><td>Showings required</td><td>No</td><td>No</td><td>No</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+        <button class="cta">Discuss tradeoffs with seller</button>
+        <div class="success-note"><strong>Success is not more offers.</strong> It is a better seller outcome with acceptable agent effort — and for most sellers that is still a traditional listing. This seller has a five-week relocation, which is what qualifies them into the investor path at all. The comparison keeps that alternative visible so the agent can route them back to it.</div>
+      </div>`;
+
+    noteEl.innerHTML = mode==='thin' ? THIN_NOTE : mode==='now'
+      ? `<p><strong>What I actually received.</strong> Two options from one partner — but they are two payment structures on a single valuation, not two competing bids. There is no second opinion on what this house is worth, so the seller has no way to judge whether $291,000 is fair. The site markets comparing up to ten offers; this is what arrived.</p>
+         <p>The package is also thin. Without a repair estimate, occupancy, or title status, a buyer prices in uncertainty by bidding low. Some of the gap below may be a data problem rather than a competition problem.</p>`
+      : `<p><strong>What the pilot would produce.</strong> The package goes to every investor whose buy box matches; the seller still deals only with their agent. The headline number isn't offers received — it's <strong>actionable</strong> offers: bids with verified funds and terms a seller could actually accept. Two of the five here don't clear that bar, and counting them would flatter the result.</p>
+         <p><strong>The measure is lift against today's default, not spread between bids.</strong> Investors underwrite off similar methods, so bids cluster by design — a tight cluster is healthy, not a failure. What matters is whether the best net offer beats the $291,000 a seller gets today.</p>
+         <p><strong>Highest gross is not best net.</strong> Investor E bids highest but can't verify funds. Investor C bids high but deducts a service fee, so its net lands below Investor A. Ranking on gross price would steer this seller wrong, which is why verification and net sit next to every number.</p>`;
+  }
+
+  function setMode(m){
+    btnNow.setAttribute('aria-pressed', m==='now');
+    btnNew.setAttribute('aria-pressed', m==='new');
+    btnThin.setAttribute('aria-pressed', m==='thin');
+    render(m);
+  }
+  btnNow.addEventListener('click',()=>setMode('now'));
+  btnNew.addEventListener('click',()=>setMode('new'));
+  btnThin.addEventListener('click',()=>setMode('thin'));
+  render('now');
+</script>
+</body>
+</html>
